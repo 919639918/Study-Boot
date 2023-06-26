@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: 12345
+
+  mail:
+    default-encoding: utf-8
+    host: smtp.qq.com
+    port: 25
+    protocol: smtp
+    username: 919639918@qq.com
+    password: mqbjeikwkkmxbeae
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 6379
+
+server:
+  port: 8000
