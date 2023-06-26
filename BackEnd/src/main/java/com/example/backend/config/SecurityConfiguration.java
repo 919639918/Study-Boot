@@ -79,7 +79,6 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
     private CorsConfigurationSource configurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
         cors.addAllowedOriginPattern("*");
@@ -90,16 +89,13 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
         return source;
-//        jejr;ek;lkr;'ke;'
     }
-
     private PersistentTokenRepository tokenRepository() {
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
         jdbcTokenRepository.setDataSource(dataSource);
         jdbcTokenRepository.setCreateTableOnStartup(true);
         return jdbcTokenRepository;
     }
-
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity security) throws Exception {
         return security.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(authorizeService).and().build();
