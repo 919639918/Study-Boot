@@ -32,13 +32,9 @@
     </div>
 
     <div style="width: 500px;background-color: white;z-index: 1 ">
-<!--      <transition name="el-zoom-in-top">-->
-<!--        <router-view/>-->
-<!--      </transition>-->
-
       <router-view v-slot="{ Component }">
-        <transition name="el-zoom-in-top">
-          <component :is="Component" />
+        <transition name="el-fade-in-linear" mode="out-in">
+          <component :is="Component" style="height: 100%"/>
         </transition>
       </router-view>
 

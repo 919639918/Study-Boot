@@ -12,8 +12,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
 import java.util.Random;
@@ -31,6 +31,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     @Autowired
     StringRedisTemplate redisTemplate;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -39,22 +40,24 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (account == null) throw new UsernameNotFoundException("用户名或密码错误!");
         return User.withUsername(account.getUsername()).password(account.getPassword()).roles("user").build();
     }
-
     @Override
     public boolean sendValidateEmail(String email, String sessionId) {
         String key = "email:" + sessionId + "::" + email;
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-            Long expire = Optional.ofNullable(redisTemplate.getExpire(key, TimeUnit.SECONDS)).orElse(0L) ;
+            Long expire = Optional.ofNullable(redisTemplate.getExpire(key, TimeUnit.SECONDS)).orElse(0L);
             if (expire > 120) {
                 return false;
             }
+        }
+        if (mapper.findAccountByName(email) != null) {
+            return false;
         }
         Random random = new Random();
         int code = random.nextInt(899999) + 100000;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(email);
-        message.setSubject("IBM");
+        message.setSubject("SYH");
         message.setText("验证码是:" + code);
         try {
             sender.send(message);
@@ -65,5 +68,25 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return false;
         }
     }
-
+    @Override
+    public String validateAndRegister(String username, String password, String email, String code, String sessionId) {
+        String key = "email:" + sessionId + "::" + email;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            String s = redisTemplate.opsForValue().get(key);
+            if (s == null)
+                return "验证码失效!";
+            if (s.equals(code)) {
+                password = encoder.encode(password);
+                if (mapper.createAccount(username, password) > 0) {
+                    return null;
+                } else {
+                    return "创建用户失败!";
+                }
+            } else {
+                return "验证码错误!";
+            }
+        } else {
+            return "请先申请验证码!";
+        }
+    }
 }

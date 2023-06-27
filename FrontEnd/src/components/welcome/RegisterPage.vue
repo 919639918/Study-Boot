@@ -68,6 +68,18 @@ const register = () => {
   formRef.value.validate((isValid) => {
     if (isValid) {
 
+      post('/api/auth/register', {
+
+        username: form.username,
+        password: form.password,
+        email: form.email,
+        code: form.code
+      }, (message) => {
+        ElMessage.success(message)
+        router.push('/')
+      });
+
+
     } else {
       ElMessage.warning('请把信息填写完整!')
     }
@@ -102,7 +114,7 @@ const validateEmail = () => {
       <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
 
         <el-form-item prop="username">
-          <el-input v-model="form.username" type="text" placeholder="用户名">
+          <el-input v-model="form.username" :maxlength="8" type="text" placeholder="用户名">
             <template #prefix>
               <el-icon>
                 <User/>
@@ -112,7 +124,7 @@ const validateEmail = () => {
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="密码">
+          <el-input v-model="form.password" :maxlength="12" type="password" placeholder="密码">
             <template #prefix>
               <el-icon>
                 <Lock/>
@@ -122,7 +134,7 @@ const validateEmail = () => {
         </el-form-item>
 
         <el-form-item prop="re_password">
-          <el-input v-model="form.re_password" type="password" placeholder="重复密码">
+          <el-input v-model="form.re_password" :maxlength="12" type="password" placeholder="重复密码">
             <template #prefix>
               <el-icon>
                 <Lock/>
@@ -146,7 +158,7 @@ const validateEmail = () => {
         <el-form-item prop="code">
           <el-row :gutter="4" style="width: 100%">
             <el-col :span="16">
-              <el-input type="text" v-model="form.code" placeholder="验证码">
+              <el-input type="text" v-model="form.code" :maxlength="6" placeholder="验证码">
                 <template #prefix>
                   <el-icon>
                     <EditPen/>
